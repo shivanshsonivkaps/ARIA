@@ -9,6 +9,7 @@ import { FaArrowUp } from "react-icons/fa";
 import { Typewriter } from "react-simple-typewriter";
 import axios from "axios";
 import Message from "@/app/(routes)/chat/Message";
+import { Suggestions } from "@/lib/constants";
 const ChatPage = ({ fullName }: { fullName: string }) => {
   const [input, setInput] = useState("");
   const [showChat, setShowChat] = useState(false);
@@ -23,7 +24,7 @@ const ChatPage = ({ fullName }: { fullName: string }) => {
     e.preventDefault();
     const Id = new Date().toLocaleString();
     const ques = { req: input, res: "..." };
-    setInput("");
+
     // setChatData({ ...chatData, [Id]: { req: input, res: "..." } });
 
     setChatData((prevChatData: any) => ({
@@ -33,14 +34,19 @@ const ChatPage = ({ fullName }: { fullName: string }) => {
 
     try {
       if (input) {
+        console.log("inside try");
         setLastInput(input);
         const res = await axios.post("http://127.0.0.1:5000/chat", {
           question: input,
         });
         const ans = res.data.answer;
-        const newData = { req: input, res: answer };
+        if (!ans) {
+          setChatData((prevChatData: any) => ({
+            ...prevChatData,
+            [Id]: { req: input, res: "something went wrong. Refresh the page" },
+          }));
+        }
         setAnswer([ans]);
-
         setLoader(false);
         // setChatData({ ...chatData, [Id]: newData });
         setChatData((prevChatData: any) => ({
@@ -50,7 +56,13 @@ const ChatPage = ({ fullName }: { fullName: string }) => {
       }
     } catch (error) {
       console.log(error);
+      setChatData((prevChatData: any) => ({
+        ...prevChatData,
+        [Id]: { req: input, res: "something went wrong. Refresh the page" },
+      }));
     }
+
+    setInput("");
   };
 
   return (
@@ -99,32 +111,31 @@ const ChatPage = ({ fullName }: { fullName: string }) => {
 
       <div className='w-full'>
         {/* Suggestions and Chat*/}
-        {!showChat && (
-          <div className='grid lg:grid-cols-2 gap-x-2 gap-y-2 mt-10 w-full'>
-            <div className='suggestion-container'>
-              <p className='font-semibold'>Chatgpt starter guide</p>
-              <p className='text-[#8a8a8a]'>write with simple examples</p>
-            </div>
-            <div className='suggestion-container'>
-              <p className='font-semibold'>Chatgpt starter guide</p>
-              <p className='text-[#8a8a8a]'>write with simple examples</p>
-            </div>
-            <div className='suggestion-container'>
-              <p className='font-semibold'>Chatgpt starter guide</p>
-              <p className='text-[#8a8a8a]'>write with simple examples</p>
-            </div>
-            <div className='suggestion-container'>
-              <p className='font-semibold'>Chatgpt starter guide</p>
-              <p className='text-[#8a8a8a]'>write with simple examples</p>
-            </div>
-          </div>
-        )}
-
+        <div className='grid lg:grid-cols-2 gap-x-2 gap-y-2 mt-10 w-full'>
+          {!showChat &&
+            Suggestions.map(({ heading, desc }, index) => (
+              <div
+                key={index}
+                className='suggestion-container cursor-pointer'
+                onClick={() => {
+                  setInput(heading);
+                  // document.getElementById("submit")?.click();
+                  setTimeout(() => {
+                    document.getElementById("submit")?.click();
+                  }, 0);
+                }}
+              >
+                <p className='font-semibold'>{heading}</p>
+                <p className='text-[#8a8a8a]'>{desc}</p>
+              </div>
+            ))}
+        </div>
         {/* CHAT */}
         <div className='w-full mt-5 flex items-center '>
           <Input
             type='text'
             fullWidth
+            value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder='Ask your question'
             variant='bordered'
@@ -134,6 +145,7 @@ const ChatPage = ({ fullName }: { fullName: string }) => {
             }}
             endContent={
               <Button
+                id='submit'
                 className='bg-white  text-black rounded-xl'
                 disabled={input === "" ? true : false}
                 onClick={handlePrompt}
