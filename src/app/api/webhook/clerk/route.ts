@@ -1,8 +1,7 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
-//@ts-ignore
-import { clerkClient } from "@clerk/nextjs";
+import { clerkClient } from "@clerk/nextjs/server";
 import { CreateUser, deleteUser, updateUser } from "@/lib/actions/user.actions";
 import { NextResponse } from "next/server";
 
@@ -60,7 +59,7 @@ export async function POST(req: Request) {
     const { id, email_addresses, first_name, last_name, phone_numbers } =
       evt.data;
     const fullName = first_name + " " + last_name;
-    const phoneNumber = phone_numbers[0].toString();
+    const phoneNumber = phone_numbers[0].phone_number.toString();
     const user = {
       name: fullName,
       clerkId: id,
