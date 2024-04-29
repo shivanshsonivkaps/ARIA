@@ -59,7 +59,7 @@ export async function POST(req: Request) {
     const { id, email_addresses, first_name, last_name, phone_numbers } =
       evt.data;
     const fullName = first_name + " " + last_name;
-    console.log("PHONE NUMBER", phone_numbers[0]);
+    console.log("PHONE NUMBER");
     //  const user = {
     //    name: fullName,
     //    clerkId: id,
