@@ -59,12 +59,11 @@ export async function POST(req: Request) {
     const { id, email_addresses, first_name, last_name, phone_numbers } =
       evt.data;
     const fullName = first_name + " " + last_name;
-    const phoneNumber = phone_numbers[0].phone_number.toString();
     const user = {
       name: fullName,
       clerkId: id,
       email: email_addresses[0].email_address,
-      phone: phoneNumber,
+      phone: phone_numbers[0].phone_number,
     };
     const newUser = await CreateUser(user);
     if (newUser) {
