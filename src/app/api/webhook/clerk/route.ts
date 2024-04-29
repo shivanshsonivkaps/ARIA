@@ -66,7 +66,7 @@ export async function POST(req: Request) {
     //    email: email_addresses[0].email_address,
     //    phone: phone_numbers[0].phone_number,
     //  };
-    console.log(phone_numbers);
+    console.log(phone_numbers[0]);
     // //  const newUser = await CreateUser(user);
     //  if (newUser) {
     //    await clerkClient.users.updateUserMetadata(id, {
