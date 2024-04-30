@@ -79,6 +79,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "OK", user: newUser });
     } catch (error) {
       console.log(error);
+      return NextResponse.json({ message: "OK", error: error });
     }
   }
   //   if (eventType === "user.updated") {
