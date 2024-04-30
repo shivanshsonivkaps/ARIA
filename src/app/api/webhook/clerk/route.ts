@@ -62,23 +62,24 @@ export async function POST(req: Request) {
 
     const user = {
       name: fullName,
-
       clerkId: id,
-
       email: email_addresses[0].email_address,
-
       phone: phone_numbers[0].phone_number,
     };
 
-    const newUser = await CreateUser(user);
-    if (newUser) {
-      await clerkClient.users.updateUserMetadata(id, {
-        publicMetadata: {
-          userId: newUser._id,
-        },
-      });
+    try {
+      const newUser = await CreateUser(user);
+      if (newUser) {
+        await clerkClient.users.updateUserMetadata(id, {
+          publicMetadata: {
+            userId: newUser._id,
+          },
+        });
+      }
+      return NextResponse.json({ message: "OK", user: newUser });
+    } catch (error) {
+      console.log(error);
     }
-    return NextResponse.json({ message: "OK", user: newUser });
   }
   //   if (eventType === "user.updated") {
   //     const { id, first_name, last_name, phone_numbers } = evt.data;
