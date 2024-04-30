@@ -60,13 +60,18 @@ export async function POST(req: Request) {
       evt.data;
     const fullName = first_name + " " + last_name;
 
-    //  const user = {
-    //    name: fullName,
-    //    clerkId: id,
-    //    email: email_addresses[0].email_address,
-    //    phone: phone_numbers[0].phone_number,
-    //  };
-    console.log(phone_numbers[0].phone_number);
+    const user = {
+      name: fullName,
+
+      clerkId: id,
+
+      email: email_addresses[0].email_address,
+
+      phone: phone_numbers[0].phone_number,
+    };
+
+    console.log(user);
+    // console.log(phone_numbers[0].phone_number);
     // //  const newUser = await CreateUser(user);
     //  if (newUser) {
     //    await clerkClient.users.updateUserMetadata(id, {
