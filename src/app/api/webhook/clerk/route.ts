@@ -70,17 +70,15 @@ export async function POST(req: Request) {
       phone: phone_numbers[0].phone_number,
     };
 
-    console.log(user);
-    // console.log(phone_numbers[0].phone_number);
-    // //  const newUser = await CreateUser(user);
-    //  if (newUser) {
-    //    await clerkClient.users.updateUserMetadata(id, {
-    //      publicMetadata: {
-    //        userId: newUser._id,
-    //      },
-    //    });
-    //  }
-    return NextResponse.json({ message: "OK", user: "newUser" });
+    const newUser = await CreateUser(user);
+    if (newUser) {
+      await clerkClient.users.updateUserMetadata(id, {
+        publicMetadata: {
+          userId: newUser._id,
+        },
+      });
+    }
+    return NextResponse.json({ message: "OK", user: newUser });
   }
   //   if (eventType === "user.updated") {
   //     const { id, first_name, last_name, phone_numbers } = evt.data;
