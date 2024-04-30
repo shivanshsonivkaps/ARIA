@@ -12,7 +12,7 @@ export const connectToDatabase = async () => {
   }
 
   const opts = {
-    dbName: "evently",
+    dbName: "nasagpt",
     bufferCommands: false,
   };
 
