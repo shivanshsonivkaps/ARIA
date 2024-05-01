@@ -9,7 +9,7 @@ const Sidebar = ({ fullName }: { fullName: string }) => {
     <div className='flex flex-col justify-between h-full p-3 w-full'>
       <div className='flex items-center justify-between p-3'>
         <p className='text-sm'>New Chat</p>
-        <FaEdit className='text-gray-500' />
+        <FaEdit className='text-gray-500 hover:text-white cursor-pointer' />
       </div>
 
       {/* HISTORY */}
