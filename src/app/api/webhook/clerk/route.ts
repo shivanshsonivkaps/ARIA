@@ -81,27 +81,26 @@ export async function POST(req: Request) {
       console.log(error);
     }
   }
-  //   if (eventType === "user.updated") {
-  //     const { id, first_name, last_name, phone_numbers } = evt.data;
-  //     const fullName = first_name + " " + last_name;
-  //     const phoneNumber = phone_numbers[0].toString();
-  //     const user = {
-  //       name: fullName,
-  //       phone: phoneNumber,
-  //     };
+  if (eventType === "user.updated") {
+    const { id, first_name, last_name, phone_numbers } = evt.data;
+    const fullName = first_name + " " + last_name;
+    const phoneNumber = phone_numbers[0].toString();
+    const user = {
+      name: fullName,
+    };
 
-  //     const updatedUser = await updateUser(id, user);
+    const updatedUser = await updateUser(id, user);
 
-  //     return NextResponse.json({ message: "OK", user: updatedUser });
-  //   }
+    return NextResponse.json({ message: "OK", user: updatedUser });
+  }
 
-  //   if (eventType === "user.deleted") {
-  //     const { id } = evt.data;
+  if (eventType === "user.deleted") {
+    const { id } = evt.data;
 
-  //     const deletedUser = await deleteUser(id!);
+    const deletedUser = await deleteUser(id!);
 
-  //     return NextResponse.json({ message: "OK", user: deletedUser });
-  //   }
+    return NextResponse.json({ message: "OK", user: deletedUser });
+  }
 
   return new Response("", { status: 200 });
 }
