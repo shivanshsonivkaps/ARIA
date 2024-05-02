@@ -24,12 +24,12 @@ const Sidebar = ({ fullName }: { fullName: string }) => {
       </div>
 
       {/* HISTORY */}
-      <div className='flex flex-col gap-4 items-start justify-start h-full p-3'>
+      <div className='flex flex-col gap-4 items-start justify-start h-full p-3 overflow-hidden whitespace-nowrap'>
         {Object.keys(chats).map((id) => (
           <p
             className={`${id === currentSession && "bg-[#2a2a2a]"}
             cursor-pointer
-             hover:bg-[#2a2a2a] rounded-lg w-full p-2 overflow-hidden transition-all ease-in-out `}
+             hover:bg-[#2a2a2a] rounded-lg w-full p-2 overflow-hidden text-ellipsis transition-all ease-in-out `}
             key={id}
             onClick={() => {
               dispatch(setCurrentSession(id));
