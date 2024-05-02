@@ -16,7 +16,7 @@ const Avatar = ({
       <div className='w-6 h-6 text-sm rounded-full p-2 bg-gray-500 flex items-center justify-center'>
         {initials}
       </div>
-      {showName && <p className='font-bold'>showName</p>}
+      {showName && <p className='font-bold'>{showName}</p>}
     </div>
   );
 };
