@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Suspense, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@nextui-org/react";
-import { FaArrowUp } from "react-icons/fa";
+import { FaArrowUp, FaSpinner } from "react-icons/fa";
 import { Typewriter } from "react-simple-typewriter";
 import axios from "axios";
 import Message from "@/app/(routes)/chat/Message";
@@ -24,7 +24,7 @@ const ChatPage = ({ fullName }: { fullName: string }) => {
   const dispatch = useAppDispatch();
   const [input, setInput] = useState("");
   // const [showChat, setShowChat] = useState(false);
-  const [chatData, setChatData] = useState<any>({});
+  const [chatData, setChatData] = useState<any>(chats);
   const [lastInput, setLastInput] = useState("");
   const [loader, setLoader] = useState(false);
   const [answer, setAnswer] = useState<any>("...");
@@ -38,35 +38,33 @@ const ChatPage = ({ fullName }: { fullName: string }) => {
     setLoader(true);
     e.preventDefault();
     const Id = new Date().toLocaleString();
+    if (currentSession === "" || currentSession === null) {
+      const newId = generateRandomAlphaNumeric();
+      dispatch(setCurrentSession(newId));
+      dispatch(addNewChat({ req: "", res: "" }));
+    }
     const ques = { req: input, res: "..." };
 
     // setChatData({ ...chatData, [Id]: { req: input, res: "..." } });
 
     setChatData((prevChatData: any) => ({
       ...prevChatData,
-      [Id]: ques,
+      [currentSession]: ques,
     }));
 
     try {
       if (input) {
-        console.log("inside try");
         setLastInput(input);
-        // const res = await axios.post("http://127.0.0.1:5000/chat", {
-        //   question: input,
-        // });
-        // const ans = res.data.answer;
-        const ans = "gello";
+        const res = await axios.post("http://127.0.0.1:5002/chat", {
+          question: input,
+          thread: currentSession,
+        });
+        const ans = res.data.answer;
         if (!ans) {
           setChatData((prevChatData: any) => ({
             ...prevChatData,
             [Id]: { req: input, res: "something went wrong. Refresh the page" },
           }));
-        }
-
-        if (currentSession === "" || currentSession === null) {
-          const newId = generateRandomAlphaNumeric();
-          dispatch(setCurrentSession(newId));
-          dispatch(addNewChat({ req: "", res: "" }));
         }
         dispatch(addNewChat({ req: input, res: ans }));
         setAnswer([ans]);
@@ -74,7 +72,7 @@ const ChatPage = ({ fullName }: { fullName: string }) => {
         // setChatData({ ...chatData, [Id]: newData });
         setChatData((prevChatData: any) => ({
           ...prevChatData,
-          [Id]: { req: input, res: ans },
+          [currentSession]: { req: input, res: ans },
         }));
       }
     } catch (error) {
@@ -114,7 +112,7 @@ const ChatPage = ({ fullName }: { fullName: string }) => {
                         <Typewriter
                           words={[res]}
                           loop={res !== "..." ? 1 : 0}
-                          typeSpeed={80}
+                          typeSpeed={30}
                         />
                       ) : (
                         <p className='text-sm'>{res}</p>
@@ -171,10 +169,14 @@ const ChatPage = ({ fullName }: { fullName: string }) => {
               <Button
                 id='submit'
                 className='bg-white  text-black rounded-xl'
-                disabled={input === "" ? true : false}
+                disabled={input === "" ? true : loader ? true : false}
                 onClick={handlePrompt}
               >
-                <FaArrowUp className='' />
+                {loader ? (
+                  <FaSpinner className='animate-spin' />
+                ) : (
+                  <FaArrowUp className='' />
+                )}
               </Button>
             }
           />

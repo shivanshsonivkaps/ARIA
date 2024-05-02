@@ -4,7 +4,12 @@ import Avatar from "@/components/avatar";
 import React from "react";
 import { FaEdit } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { setCurrentSession, setShowChat } from "@/lib/features/chat/chatSlice";
+import {
+  removeChat,
+  setCurrentSession,
+  setShowChat,
+} from "@/lib/features/chat/chatSlice";
+import { MdDeleteForever } from "react-icons/md";
 const Sidebar = ({ fullName }: { fullName: string }) => {
   const chats = useAppSelector((state) => state.chats);
   const currentSession = useAppSelector((state) => state.currentSession);
@@ -26,17 +31,28 @@ const Sidebar = ({ fullName }: { fullName: string }) => {
       {/* HISTORY */}
       <div className='flex flex-col gap-4 items-start justify-start h-full p-3 overflow-hidden whitespace-nowrap'>
         {Object.keys(chats).map((id) => (
-          <p
+          <div
             className={`${id === currentSession && "bg-[#2a2a2a]"}
             cursor-pointer
-             hover:bg-[#2a2a2a] rounded-lg w-full p-2 overflow-hidden text-ellipsis transition-all ease-in-out `}
+             hover:bg-[#2a2a2a] flex items-center justify-between rounded-lg w-full p-2 overflow-hidden text-ellipsis transition-all ease-in-out `}
             key={id}
-            onClick={() => {
-              dispatch(setCurrentSession(id));
-            }}
           >
-            {chats[id][0]?.req}
-          </p>
+            <p
+              className='w-8/12 overflow-hidden text-ellipsis'
+              onClick={() => {
+                dispatch(setCurrentSession(id));
+              }}
+            >
+              {chats[id][0]?.req}
+            </p>
+            <MdDeleteForever
+              className='hover:text-white text-[#6b6b6b]'
+              onClick={() => {
+                console.log(id);
+                dispatch(removeChat(id));
+              }}
+            />
+          </div>
         ))}
       </div>
 

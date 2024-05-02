@@ -33,14 +33,19 @@ export const counterSlice = createSlice({
       if (!state.chats[currentSession]) {
         state.chats[currentSession] = [];
       }
+
       if (action.payload.req !== "" && action.payload.res !== "") {
         const { req, res } = action.payload;
         state.chats[currentSession].push({ req, res });
       }
     },
+    removeChat: (state, action) => {
+      const chats = state.chats;
+      delete chats[action.payload];
+    },
   },
 });
 
-export const { setCurrentSession, addNewChat, setShowChat } =
+export const { setCurrentSession, addNewChat, setShowChat, removeChat } =
   counterSlice.actions;
 export default counterSlice.reducer;
