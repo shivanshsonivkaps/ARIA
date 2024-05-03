@@ -55,10 +55,17 @@ const ChatPage = ({ fullName }: { fullName: string }) => {
     try {
       if (input) {
         setLastInput(input);
-        const res = await axios.post("http://127.0.0.1:5002/chat", {
-          question: input,
-          thread: currentSession,
-        });
+        const res = await axios.post(
+          "https://nasagpt.vkapsprojects.com/chat",
+          { question: input, thread: currentSession },
+          {
+            auth: {
+              username: "vkaps",
+              password: "Vkaps@2024",
+            },
+          }
+        );
+
         const ans = res.data.answer;
         if (!ans) {
           setChatData((prevChatData: any) => ({
@@ -107,7 +114,7 @@ const ChatPage = ({ fullName }: { fullName: string }) => {
                       <p>{req || lastInput}</p>
                     </div>
                     <div className='flex flex-col gap-3'>
-                      <Avatar fullName='GPT' showName='GPT' />
+                      <Avatar fullName='GPT' showName='NasaGPT' />
                       {req === lastInput ? (
                         <Typewriter
                           words={[res]}
@@ -161,6 +168,7 @@ const ChatPage = ({ fullName }: { fullName: string }) => {
             onChange={(e) => setInput(e.target.value)}
             placeholder='Ask your question'
             variant='bordered'
+            disabled={loader ? true : false}
             classNames={{
               label: "text-black/50 dark:text-white/90",
               inputWrapper: ["!h-[60px] rounded-2xl"],

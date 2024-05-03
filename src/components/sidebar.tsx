@@ -33,6 +33,7 @@ const Sidebar = ({ fullName }: { fullName: string }) => {
         {Object.keys(chats).map((id) => (
           <div
             className={`${id === currentSession && "bg-[#2a2a2a]"}
+
             cursor-pointer
              hover:bg-[#2a2a2a] flex items-center justify-between rounded-lg w-full p-2 overflow-hidden text-ellipsis transition-all ease-in-out `}
             key={id}
