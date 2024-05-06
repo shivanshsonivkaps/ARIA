@@ -46,7 +46,8 @@ export const createChat = async ({
       res: ans,
     };
   } catch (error) {
-    handleError(error);
+    // handleError(error);
+    console.log(error);
     return {
       req: question,
       res: "Something went wrong. Please try again.",

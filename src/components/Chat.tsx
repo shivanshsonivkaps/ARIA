@@ -40,6 +40,8 @@ const ChatPage = ({ fullName }: { fullName: string }) => {
       question: input,
       session: currentSession,
     });
+
+    console.log(response);
     const ans = response.res;
     if (currentSession === "" || currentSession === null) {
       const newId = generateRandomAlphaNumeric();

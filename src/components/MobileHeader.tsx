@@ -32,7 +32,7 @@ const PhoneSidebar = ({
 }) => {
   return (
     <Sheet open={dialogOpen} onOpenChange={handleCloseDialog}>
-      <SheetTrigger onClick={() => handleCloseDialog()} data-set={dialogOpen}>
+      <SheetTrigger onClick={() => handleCloseDialog()}>
         <HiOutlineBars3CenterLeft className='text-gray-500 hover:text-white cursor-pointer text-2xl font-bold' />
       </SheetTrigger>
 
