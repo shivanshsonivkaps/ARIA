@@ -2,13 +2,11 @@
 import ChatGPT from "@/assets/chatgpt.png";
 import Avatar from "@/components/avatar";
 import Image from "next/image";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@nextui-org/react";
 import { FaArrowUp, FaSpinner } from "react-icons/fa";
 import { Typewriter } from "react-simple-typewriter";
-import axios from "axios";
-import Message from "@/app/(routes)/chat/Message";
 import { Suggestions } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
@@ -17,17 +15,17 @@ import {
   setShowChat,
 } from "@/lib/features/chat/chatSlice";
 import { generateRandomAlphaNumeric } from "@/lib/utils";
+import { createChat } from "@/lib/actions/chat.actions";
+
 const ChatPage = ({ fullName }: { fullName: string }) => {
   const chats = useAppSelector((state) => state.chats);
   const showChat = useAppSelector((state) => state.showChat);
   const currentSession = useAppSelector((state) => state.currentSession);
   const dispatch = useAppDispatch();
   const [input, setInput] = useState("");
-  // const [showChat, setShowChat] = useState(false);
   const [chatData, setChatData] = useState<any>(chats);
   const [lastInput, setLastInput] = useState("");
   const [loader, setLoader] = useState(false);
-  const [answer, setAnswer] = useState<any>("...");
 
   useEffect(() => {
     setChatData(chats);
@@ -37,59 +35,24 @@ const ChatPage = ({ fullName }: { fullName: string }) => {
     dispatch(setShowChat(true));
     setLoader(true);
     e.preventDefault();
-    const Id = new Date().toLocaleString();
+    setLastInput(input);
+    const response = await createChat({
+      question: input,
+      session: currentSession,
+    });
+    const ans = response.res;
     if (currentSession === "" || currentSession === null) {
       const newId = generateRandomAlphaNumeric();
       dispatch(setCurrentSession(newId));
       dispatch(addNewChat({ req: "", res: "" }));
     }
-    const ques = { req: input, res: "..." };
-
-    // setChatData({ ...chatData, [Id]: { req: input, res: "..." } });
-
+    if (ans !== "Something went wrong. Please try again.")
+      dispatch(addNewChat({ req: input, res: response.res }));
     setChatData((prevChatData: any) => ({
       ...prevChatData,
-      [currentSession]: ques,
+      [currentSession]: { req: input, res: ans },
     }));
-
-    try {
-      if (input) {
-        setLastInput(input);
-        const res = await axios.post(
-          "https://nasagpt.vkapsprojects.com/chat",
-          { question: input, thread: currentSession },
-          {
-            auth: {
-              username: "vkaps",
-              password: "Vkaps@2024",
-            },
-          }
-        );
-
-        const ans = res.data.answer;
-        if (!ans) {
-          setChatData((prevChatData: any) => ({
-            ...prevChatData,
-            [Id]: { req: input, res: "something went wrong. Refresh the page" },
-          }));
-        }
-        dispatch(addNewChat({ req: input, res: ans }));
-        setAnswer([ans]);
-        setLoader(false);
-        // setChatData({ ...chatData, [Id]: newData });
-        setChatData((prevChatData: any) => ({
-          ...prevChatData,
-          [currentSession]: { req: input, res: ans },
-        }));
-      }
-    } catch (error) {
-      console.log(error);
-      setChatData((prevChatData: any) => ({
-        ...prevChatData,
-        [Id]: { req: input, res: "something went wrong. Refresh the page" },
-      }));
-    }
-
+    setLoader(false);
     setInput("");
   };
 
@@ -189,6 +152,9 @@ const ChatPage = ({ fullName }: { fullName: string }) => {
             }
           />
         </div>
+        <p className='text-center text-[11px] my-2'>
+          ChatGPT can make mistakes. Consider checking important information.
+        </p>
       </div>
     </div>
   );

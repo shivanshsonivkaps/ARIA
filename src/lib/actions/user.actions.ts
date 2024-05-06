@@ -23,8 +23,8 @@ export const CreateUser = async ({
   }
 };
 
-export const deleteUser = async () => {};
-export const updateUser = async () => {};
+export const deleteUser = async (id: string) => {};
+export const updateUser = async (id: string, user: any) => {};
 
 export const getAllCategories = async () => {
   try {
