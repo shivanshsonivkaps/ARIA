@@ -12,7 +12,7 @@ const layout = () => {
     <>
       <div className='bg-[#171717] sm:hidden'>
         {/* <PhoneSidebar /> */}
-        <MobileHeader />
+        <MobileHeader fullName={fullName} />
       </div>
       <div className='w-screen h-screen overflow-hidden flex items-center '>
         <div className='md:main-container   md:basis-[25%] bg-[#171717] h-full'>

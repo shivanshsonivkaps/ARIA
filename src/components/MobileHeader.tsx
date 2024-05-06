@@ -12,6 +12,8 @@ import { MdDeleteForever } from "react-icons/md";
 import NewChat from "./NewChat";
 import { Separator } from "./ui/separator";
 import { useState } from "react";
+import { UserButton } from "@clerk/nextjs";
+import Avatar from "./avatar";
 
 const PhoneSidebar = ({
   dispatch,
@@ -19,11 +21,13 @@ const PhoneSidebar = ({
   chats,
   dialogOpen,
   handleCloseDialog,
+  fullName,
 }: {
   dispatch: any;
   session: string;
   dialogOpen: boolean;
   chats: any;
+  fullName: string;
   handleCloseDialog: () => void;
 }) => {
   return (
@@ -38,7 +42,7 @@ const PhoneSidebar = ({
       >
         <NewChat />
         <Separator />
-        <div className='flex flex-col gap-4 items-start justify-start h-full p-3 overflow-hidden whitespace-nowrap'>
+        <div className='flex flex-col gap-4 items-start justify-start h-full p-3 overflow-hidden whitespace-nowrap '>
           {Object.keys(chats).map((id) => (
             <div
               className={`${id === session && "bg-[#2a2a2a]"}
@@ -67,12 +71,17 @@ const PhoneSidebar = ({
             </div>
           ))}
         </div>
+        <div className='flex items-center gap-2 mb-4 w-full'>
+          <UserButton />
+          <Avatar fullName={fullName} />
+          <p>{fullName || ""}</p>
+        </div>
       </SheetContent>
     </Sheet>
   );
 };
 
-const MobileHeader = () => {
+const MobileHeader = ({ fullName }: { fullName: string }) => {
   const dispatch = useAppDispatch();
   const currentSession = useAppSelector((state) => state.currentSession);
   const chats = useAppSelector((state) => state.chats);
@@ -88,6 +97,7 @@ const MobileHeader = () => {
         session={currentSession}
         chats={chats}
         dialogOpen={dialogOpen}
+        fullName={fullName}
         handleCloseDialog={handleCloseDialog}
       />
 
