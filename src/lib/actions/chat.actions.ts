@@ -4,23 +4,52 @@ import { connectToDatabase } from "../database";
 import { User } from "@/lib/database/models/user.model";
 import { CreateUserParams } from "@/types";
 import { Chat } from "../database/models/chat.model";
+import axios from "axios";
 export const createChat = async ({
-  name,
-  email,
-  phone,
-  clerkId,
-}: CreateUserParams) => {
+  question,
+  session,
+}: {
+  question: string;
+  session: string;
+}) => {
   try {
-    await connectToDatabase();
-    const newCategory = await User.create({
-      name: name,
-      email: email,
-      phone: phone,
-      clerkID: clerkId,
-    });
-    return JSON.parse(JSON.stringify(newCategory));
+    // await connectToDatabase();
+    // const newCategory = await User.create({
+    //   name: name,
+    //   email: email,
+    //   phone: phone,
+    //   clerkID: clerkId,
+    // });
+    // return JSON.parse(JSON.stringify(newCategory));
+
+    const res = await axios.post(
+      process.env.PYTHON_API_URL!,
+      { question: question, thread: session },
+      {
+        auth: {
+          username: process.env.API_USERNAME!,
+          password: process.env.API_PASSWORD!,
+        },
+      }
+    );
+    const ans = res.data.answer;
+    if (!ans) {
+      return {
+        req: question,
+        res: "Something went wrong. Please try again.",
+      };
+    }
+
+    return {
+      req: question,
+      res: ans,
+    };
   } catch (error) {
     handleError(error);
+    return {
+      req: question,
+      res: "Something went wrong. Please try again.",
+    };
   }
 };
 

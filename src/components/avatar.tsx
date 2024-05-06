@@ -13,10 +13,10 @@ const Avatar = ({
 
   return (
     <div className='flex items-center gap-3'>
-      <div className='w-6 h-6 text-sm rounded-full p-2 bg-gray-500 flex items-center justify-center'>
-        {initials}
+      <div className='w-6 h-6  rounded-full p-3  bg-gray-500 flex items-center justify-center '>
+        <p className='text-sm text-center '>{initials}</p>
       </div>
-      {showName && showName}
+      {showName && <p className='font-bold'>{showName}</p>}
     </div>
   );
 };

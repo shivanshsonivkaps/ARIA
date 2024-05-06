@@ -2,66 +2,57 @@
 import ChatGPT from "@/assets/chatgpt.png";
 import Avatar from "@/components/avatar";
 import Image from "next/image";
-import { Suspense, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@nextui-org/react";
-import { FaArrowUp } from "react-icons/fa";
+import { FaArrowUp, FaSpinner } from "react-icons/fa";
 import { Typewriter } from "react-simple-typewriter";
-import axios from "axios";
-import Message from "@/app/(routes)/chat/Message";
 import { Suggestions } from "@/lib/constants";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import {
+  addNewChat,
+  setCurrentSession,
+  setShowChat,
+} from "@/lib/features/chat/chatSlice";
+import { generateRandomAlphaNumeric } from "@/lib/utils";
+import { createChat } from "@/lib/actions/chat.actions";
+
 const ChatPage = ({ fullName }: { fullName: string }) => {
+  const chats = useAppSelector((state) => state.chats);
+  const showChat = useAppSelector((state) => state.showChat);
+  const currentSession = useAppSelector((state) => state.currentSession);
+  const dispatch = useAppDispatch();
   const [input, setInput] = useState("");
-  const [showChat, setShowChat] = useState(false);
-  const [chatData, setChatData] = useState<any>({});
+  const [chatData, setChatData] = useState<any>(chats);
   const [lastInput, setLastInput] = useState("");
   const [loader, setLoader] = useState(false);
-  const [answer, setAnswer] = useState<any>("...");
+
+  useEffect(() => {
+    setChatData(chats);
+  }, [chats]);
 
   const handlePrompt = async (e: any) => {
-    setShowChat(true);
+    dispatch(setShowChat(true));
     setLoader(true);
     e.preventDefault();
-    const Id = new Date().toLocaleString();
-    const ques = { req: input, res: "..." };
-
-    // setChatData({ ...chatData, [Id]: { req: input, res: "..." } });
-
+    setLastInput(input);
+    const response = await createChat({
+      question: input,
+      session: currentSession,
+    });
+    const ans = response.res;
+    if (currentSession === "" || currentSession === null) {
+      const newId = generateRandomAlphaNumeric();
+      dispatch(setCurrentSession(newId));
+      dispatch(addNewChat({ req: "", res: "" }));
+    }
+    if (ans !== "Something went wrong. Please try again.")
+      dispatch(addNewChat({ req: input, res: response.res }));
     setChatData((prevChatData: any) => ({
       ...prevChatData,
-      [Id]: ques,
+      [currentSession]: { req: input, res: ans },
     }));
-
-    try {
-      if (input) {
-        console.log("inside try");
-        setLastInput(input);
-        const res = await axios.post("http://127.0.0.1:5000/chat", {
-          question: input,
-        });
-        const ans = res.data.answer;
-        if (!ans) {
-          setChatData((prevChatData: any) => ({
-            ...prevChatData,
-            [Id]: { req: input, res: "something went wrong. Refresh the page" },
-          }));
-        }
-        setAnswer([ans]);
-        setLoader(false);
-        // setChatData({ ...chatData, [Id]: newData });
-        setChatData((prevChatData: any) => ({
-          ...prevChatData,
-          [Id]: { req: input, res: ans },
-        }));
-      }
-    } catch (error) {
-      console.log(error);
-      setChatData((prevChatData: any) => ({
-        ...prevChatData,
-        [Id]: { req: input, res: "something went wrong. Refresh the page" },
-      }));
-    }
-
+    setLoader(false);
     setInput("");
   };
 
@@ -70,36 +61,37 @@ const ChatPage = ({ fullName }: { fullName: string }) => {
       {/* Chat */}
 
       {showChat && (
-        // <Message
-        //   fullName={fullName}
-        //   chatData={chatData}
-        //   lastInput={lastInput}
-        // />
         <div className=' w-full h-full overflow-y-scroll  flex flex-col items-start justify-start p-5 text-sm'>
           {chatData &&
-            Object.keys(chatData).map((id: any) => {
-              const { req, res } = chatData[id];
-              return (
-                <div key={id} className='flex flex-col my-5 gap-10  w-full'>
-                  <div className='flex flex-col gap-3'>
-                    <Avatar fullName={fullName} showName='You' />
-                    <p>{req || lastInput}</p>
+            chats &&
+            chats[currentSession] &&
+            chats[currentSession].map(
+              ({ req, res }: { req: string; res: string }, index: string) => {
+                return (
+                  <div
+                    key={index}
+                    className='flex flex-col my-5 gap-10  w-full'
+                  >
+                    <div className='flex flex-col gap-3'>
+                      <Avatar fullName={fullName} showName='You' />
+                      <p>{req || lastInput}</p>
+                    </div>
+                    <div className='flex flex-col gap-3'>
+                      <Avatar fullName='GPT' showName='NasaGPT' />
+                      {req === lastInput ? (
+                        <Typewriter
+                          words={[res]}
+                          loop={res !== "..." ? 1 : 0}
+                          typeSpeed={30}
+                        />
+                      ) : (
+                        <p className='text-sm'>{res}</p>
+                      )}
+                    </div>
                   </div>
-                  <div className='flex flex-col gap-3'>
-                    <Avatar fullName='GPT' showName='GPT' />
-                    {req === lastInput ? (
-                      <Typewriter
-                        words={[res]}
-                        loop={res !== "..." ? 1 : 0}
-                        typeSpeed={80}
-                      />
-                    ) : (
-                      <p className='text-sm'>{res}</p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                );
+              }
+            )}
         </div>
       )}
       {!showChat && (
@@ -139,6 +131,7 @@ const ChatPage = ({ fullName }: { fullName: string }) => {
             onChange={(e) => setInput(e.target.value)}
             placeholder='Ask your question'
             variant='bordered'
+            disabled={loader ? true : false}
             classNames={{
               label: "text-black/50 dark:text-white/90",
               inputWrapper: ["!h-[60px] rounded-2xl"],
@@ -147,14 +140,21 @@ const ChatPage = ({ fullName }: { fullName: string }) => {
               <Button
                 id='submit'
                 className='bg-white  text-black rounded-xl'
-                disabled={input === "" ? true : false}
+                disabled={input === "" ? true : loader ? true : false}
                 onClick={handlePrompt}
               >
-                <FaArrowUp className='' />
+                {loader ? (
+                  <FaSpinner className='animate-spin' />
+                ) : (
+                  <FaArrowUp className='' />
+                )}
               </Button>
             }
           />
         </div>
+        <p className='text-center text-[11px] my-2'>
+          ChatGPT can make mistakes. Consider checking important information.
+        </p>
       </div>
     </div>
   );
