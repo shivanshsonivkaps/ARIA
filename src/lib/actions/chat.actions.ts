@@ -30,15 +30,16 @@ export const createChat = async ({
           username: process.env.API_USERNAME!,
           password: process.env.API_PASSWORD!,
         },
+        timeout: 25000,
       }
     );
-    const ans = res.data.answer;
-    if (!ans) {
+    if (!res) {
       return {
         req: question,
         res: "Something went wrong. Please try again.",
       };
     }
+    const ans = res.data.answer;
 
     return {
       req: question,
