@@ -42,7 +42,8 @@ const PhoneSidebar = ({
       >
         <NewChat />
         <Separator />
-        <div className='flex flex-col gap-4 items-start justify-start h-full p-3 overflow-hidden whitespace-nowrap '>
+        <p className='text-sm my-2 text-gray-300 font-bold'>History</p>
+        <div className='flex flex-col gap-4 items-start justify-start h-full  overflow-hidden whitespace-nowrap  w-full'>
           {Object.keys(chats).map((id) => (
             <div
               className={`${id === session && "bg-[#2a2a2a]"}
